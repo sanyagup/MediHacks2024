@@ -1,0 +1,15 @@
+html {
+    height: 100%;
+    width: 100%;
+  }
+
+body {
+    background-image: linear-gradient(#E8CBC0, #636FA4);
+    background-color: #636FA4;
+}
+
+h1 {
+    text-align: center;
+    background-color: #E8CBC0;
+    font-family: Brush Script MT, Brush Script Std, cursive;
+}
