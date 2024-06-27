@@ -10,28 +10,22 @@
 
   <body>
       <h1 id="title">Welcome to Analyzing Medical Data</h1>
-      <h1>Linear Regression Model</h1>
+      <h2>Linear Regression Model</h2>
     <button onclick="fetchModel()">Fetch Model</button>
-    <div id="model"></div>
+    <div>
+        <img id="regressionPlot" src="" alt="Linear Regression Plot">
+    </div>
 
     <script>
         async function fetchModel() {
             try {
                 const response = await fetch('http://127.0.0.1:5000/api/linear-regression');
-                const data = await response.json();
-                console.log(data);
-                displayModel(data);
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                document.getElementById('regressionPlot').src = url;
             } catch (error) {
                 console.error('Error fetching model:', error);
             }
-        }
-
-        function displayModel(data) {
-            const modelDiv = document.getElementById('model');
-            modelDiv.innerHTML = `
-                <p>Intercept: ${data.intercept}</p>
-                <p>Coefficient: ${data.coefficient}</p>
-            `;
         }
     </script>
   </body>

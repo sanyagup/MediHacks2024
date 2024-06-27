@@ -1,7 +1,11 @@
-from flask import Flask, jsonify
+from flask import Flask, send_file
 from flask_cors import CORS
 import pandas as pd
 from sklearn.linear_model import LinearRegression
+import matplotlib
+matplotlib.use('Agg')  # Use the Agg backend for rendering plots
+import matplotlib.pyplot as plt
+import io
 
 app = Flask(__name__)
 CORS(app)
@@ -21,15 +25,24 @@ def linear_regression():
     model = LinearRegression()
     model.fit(X, y)
 
-    # Get model parameters
-    intercept = model.intercept_
-    coef = model.coef_[0]
+    # Get model predictions
+    predictions = model.predict(X)
 
-    result = {
-        'intercept': intercept,
-        'coefficient': coef
-    }
-    return jsonify(result)
+    # Plotting
+    plt.figure()
+    plt.scatter(df['X'], df['Y'], color='blue', label='Original Data')
+    plt.plot(df['X'], predictions, color='red', linewidth=2, label='Regression Line')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.legend()
+
+    # Save plot to a BytesIO object
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    plt.close()
+
+    return send_file(img, mimetype='image/png')
 
 if __name__ == '__main__':
     app.run(debug=True)
