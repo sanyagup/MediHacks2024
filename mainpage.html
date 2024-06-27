@@ -10,7 +10,30 @@
 
   <body>
       <h1 id="title">Welcome to Analyzing Medical Data</h1>
-      <script src="script.js"></script>
+      <h1>Linear Regression Model</h1>
+    <button onclick="fetchModel()">Fetch Model</button>
+    <div id="model"></div>
+
+    <script>
+        async function fetchModel() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/linear-regression');
+                const data = await response.json();
+                console.log(data);
+                displayModel(data);
+            } catch (error) {
+                console.error('Error fetching model:', error);
+            }
+        }
+
+        function displayModel(data) {
+            const modelDiv = document.getElementById('model');
+            modelDiv.innerHTML = `
+                <p>Intercept: ${data.intercept}</p>
+                <p>Coefficient: ${data.coefficient}</p>
+            `;
+        }
+    </script>
   </body>
 
 </html>
