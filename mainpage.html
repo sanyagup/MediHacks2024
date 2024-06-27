@@ -10,24 +10,44 @@
 
   <body>
       <h1 id="title">Welcome to Analyzing Medical Data</h1>
-      <h2>Linear Regression Model</h2>
-    <button onclick="fetchModel()">Fetch Model</button>
-    <div>
-        <img id="regressionPlot" src="" alt="Linear Regression Plot">
-    </div>
-
-    <script>
-        async function fetchModel() {
-            try {
-                const response = await fetch('http://127.0.0.1:5000/api/linear-regression');
-                const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                document.getElementById('regressionPlot').src = url;
-            } catch (error) {
-                console.error('Error fetching model:', error);
+      <body>
+        <h2>Upload CSV for Linear Regression</h2>
+        <form id="upload-form">
+            <label for="file">CSV File:</label>
+            <input type="file" id="file" name="file" accept=".csv"><br><br>
+    
+            <label for="features">Features (comma-separated):</label>
+            <input type="text" id="features" name="features"><br><br>
+    
+            <label for="target">Target:</label>
+            <input type="text" id="target" name="target"><br><br>
+    
+            <button type="button" onclick="uploadFile()">Upload and Analyze</button>
+        </form>
+    
+        <h2>Result:</h2>
+        <img id="result-image" src="" alt="Result will be displayed here">
+    
+        <script>
+            async function uploadFile() {
+                const form = document.getElementById('upload-form');
+                const formData = new FormData(form);
+    
+                const response = await fetch('http://127.0.0.1:5000/api/linear-regression', {
+                    method: 'POST',
+                    body: formData
+                });
+    
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    document.getElementById('result-image').src = url;
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + error.error);
+                }
             }
-        }
-    </script>
-  </body>
+        </script>
+    </body>
 
 </html>

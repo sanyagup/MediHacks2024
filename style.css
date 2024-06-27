@@ -17,3 +17,9 @@ h1 {
 #title {
     font-style:#95D2B3;
 }
+
+#result-image {
+    border-radius: 8px;
+    width: 350px;
+    height: 250px;
+}

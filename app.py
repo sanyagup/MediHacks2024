@@ -1,4 +1,4 @@
-from flask import Flask, send_file
+from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 import pandas as pd
 from sklearn.linear_model import LinearRegression
@@ -10,18 +10,36 @@ import io
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/api/linear-regression', methods=['GET'])
+@app.route('/api/linear-regression', methods=['POST'])
 def linear_regression():
-    # Sample data
-    data = {
-        'X': [1, 2, 3, 4, 5],
-        'Y': [2, 4, 5, 4, 5]
-    }
-    df = pd.DataFrame(data)
+    # Get the uploaded file and columns from the request
+    if 'file' not in request.files:
+        return jsonify({"error": "File must be provided"}), 400
+    
+    file = request.files['file']
+    features = request.form.get('features')
+    target = request.form.get('target')
+
+    if not file or not features or not target:
+        return jsonify({"error": "File, features, and target must be provided"}), 400
+
+    # Convert features string to a list
+    features = [x.strip() for x in features.split(',')]
+
+    # Read the CSV file from the uploaded file
+    try:
+        df = pd.read_csv(file)
+    except Exception as e:
+        return jsonify({"error": f"Error reading CSV file: {e}"}), 400
+
+    # Check if required columns exist in the dataset
+    required_columns = set(features + [target])
+    if not required_columns.issubset(df.columns):
+        return jsonify({"error": f"CSV file must contain the following columns: {', '.join(required_columns)}"}), 400
 
     # Linear regression model
-    X = df[['X']]
-    y = df['Y']
+    X = df[features]
+    y = df[target]
     model = LinearRegression()
     model.fit(X, y)
 
@@ -30,10 +48,12 @@ def linear_regression():
 
     # Plotting
     plt.figure()
-    plt.scatter(df['X'], df['Y'], color='blue', label='Original Data')
-    plt.plot(df['X'], predictions, color='red', linewidth=2, label='Regression Line')
-    plt.xlabel('X')
-    plt.ylabel('Y')
+    for feature in features:
+        plt.scatter(df[feature], df[target], label=f'{feature} vs {target}')
+        plt.plot(df[feature], predictions, linewidth=2, label=f'Regression Line ({feature})')
+    
+    plt.xlabel('Features')
+    plt.ylabel(target)
     plt.legend()
 
     # Save plot to a BytesIO object
